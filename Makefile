@@ -21,7 +21,7 @@ LDFLAGS = -O3 -Wall \
 
 DISTNAME = cpabe-0.11
 
-TARGETS  = cpabe-setup   cpabe-enc   cpabe-keygen   cpabe-dec   cpabe-all
+TARGETS  =aes-test  cpabe-setup   cpabe-enc   cpabe-keygen   cpabe-dec   cpabe-all
 DEVTARGS = test-lang TAGS
 
 MANUALS  = $(TARGETS:=.1)
@@ -30,6 +30,8 @@ HTMLMANS = $(MANUALS:.1=.html)
 all: $(TARGETS) $(DEVTARGS)
 
 # user-level compilation
+aes-test: aes-cbc.o
+	$(CC) -o $@ $^ $(LDFLAGS)
 cpabe-all:	allcpabe.o common.o policy_lang.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 cpabe-setup: setup.o common.o

@@ -6,6 +6,8 @@
 #include <glib.h>
 #include <pbc.h>
 #include <pbc_random.h>
+#include <time.h> 
+#include<sys/time.h>
 
 #include "bswabe.h"
 #include "common.h"
@@ -36,15 +38,16 @@ char* default_msk_file = "master_key";
 
 char* in_file  = 0;
 //char* out_file = 0;
-int   keep     = 0;
+int   keep     = 1;
 char* policy = 0;
 char*  pub_file = 0;
 char*  prv_file=0;
 char*  msk_file = 0;
 char** attrs    = 0;
-char*  out_file = "priv_key";
+char*  out_file = 0;
 
 
+clock_t start,finish;  
 		void
 setup_args( int argc, char** argv )
 {
@@ -179,6 +182,7 @@ void enc( int argc, char** argv )
 
 		enc_args(argc, argv);
 
+
 		pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
 
 		if( !(cph = bswabe_enc(pub, m, policy)) )
@@ -193,7 +197,6 @@ void enc( int argc, char** argv )
 		aes_buf = aes_128_cbc_encrypt(plt, m);
 		g_byte_array_free(plt, 1);
 		element_clear(m);
-
 		write_cpabe_file(out_file, cph_buf, file_len, aes_buf);
 
 		g_byte_array_free(cph_buf, 1);
@@ -449,13 +452,17 @@ dec( int argc, char** argv )
 		bswabe_cph_t* cph;
 		element_t m;
 
+		out_file="result.txt";
 		dec_args(argc, argv);
 
+
+		struct  timeval    startTv,endTv;
 		pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
 		prv = bswabe_prv_unserialize(pub, suck_file(prv_file), 1);
 
 		read_cpabe_file(in_file, &cph_buf, &file_len, &aes_buf);
-
+		
+		gettimeofday(&startTv,NULL);
 		cph = bswabe_cph_unserialize(pub, cph_buf, 1);
 		if( !bswabe_dec(pub, prv, cph, m) )
 				die("%s", bswabe_error());
@@ -467,6 +474,11 @@ dec( int argc, char** argv )
 
 		spit_file(out_file, plt, 1);
 
+		gettimeofday(&endTv,NULL);
+		double timer;
+		timer=1000000.0 * (endTv.tv_sec-startTv.tv_sec)+ endTv.tv_usec-startTv.tv_usec;
+		 printf("timer = %.3f ms\n",timer/1000);
+
 		if( !keep )
 				unlink(in_file);
 
@@ -477,9 +489,11 @@ dec( int argc, char** argv )
 		/* 					 "multiplications: %5d\n", num_pairings, num_exps, num_muls); */
 
 }
+
 int main( int argc, char** argv )
 {
-		enc(argc,argv);
+		double TheTimes;
+		dec(argc,argv);
 		return 0;
 }
 
