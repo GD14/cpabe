@@ -160,14 +160,15 @@ enc_args( int argc, char** argv )
 				policy = parse_policy_lang(suck_stdin());
 }
 
+bswabe_pub_t* pub=0;
+bswabe_msk_t* msk=0;
+bswabe_prv_t* prv;
 
+
+	
 void setup(){
-			bswabe_pub_t* pub;
-		bswabe_msk_t* msk;
+	if(pub==NULL&&msk==NULL)	
 	bswabe_setup(&pub, &msk);
-		spit_file(default_pub_file, bswabe_pub_serialize(pub), 1);
-		spit_file(default_msk_file, bswabe_msk_serialize(msk), 1);
-
 }
 
 void enc( int argc, char** argv )
@@ -183,7 +184,8 @@ void enc( int argc, char** argv )
 		enc_args(argc, argv);
 
 
-		pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
+	//  get from the global var
+	//	pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
 
 		if( !(cph = bswabe_enc(pub, m, policy)) )
 				die("%s", bswabe_error());
@@ -289,7 +291,6 @@ keygen_args( int argc, char** argv )
 				}
 				else
 				{
-						printf("*%s*\n",argv[i]);
 						parse_attribute(&alist, argv[i]);
 				}
 
@@ -309,11 +310,7 @@ keygen_args( int argc, char** argv )
 
 void keygen( int argc, char** argv )
 {
-		bswabe_pub_t* pub;
-		bswabe_msk_t* msk;
-		bswabe_prv_t* prv;
-
-		keygen_args(argc, argv);
+				keygen_args(argc, argv);
 
 		pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
 		msk = bswabe_msk_unserialize(pub, suck_file(msk_file), 1);
@@ -494,7 +491,7 @@ dec( int argc, char** argv )
 int main( int argc, char** argv )
 {
 		double TheTimes;
-		keygen(argc,argv);
+		dec(argc,argv);
 		return 0;
 }
 

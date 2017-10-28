@@ -84,8 +84,9 @@ parse_args( int argc, char** argv )
 	if( !out_file )
 		out_file = g_strdup_printf("%s.cpabe", in_file);
 
-	if( !policy )
+	if( !policy ){
 		policy = parse_policy_lang(suck_stdin());
+		}
 }
 
 int
@@ -100,9 +101,9 @@ main( int argc, char** argv )
 	element_t m;
 
 	parse_args(argc, argv);
-
+	printf("%s\n",policy);
 	pub = bswabe_pub_unserialize(suck_file(pub_file), 1);
-
+	
   if( !(cph = bswabe_enc(pub, m, policy)) )
 		die("%s", bswabe_error());
 	free(policy);
